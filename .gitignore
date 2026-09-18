@@ -1,0 +1,12 @@
+build/bin/
+dist/
+frontend/dist/
+node_modules/
+vendor/
+.DS_Store
+*.log
+
+# 私有内容：插件、隔离审计词表、私人笔记
+plugins/
+.audit-patterns
+docs/private/

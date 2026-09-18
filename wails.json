@@ -1,0 +1,18 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "Tacivan",
+  "outputfilename": "Tacivan",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "Tom",
+    "email": "tomeageer@gmail.com"
+  },
+  "info": {
+    "productName": "Tacivan",
+    "companyName": "Tacivan",
+    "comments": "Tacivan — database client"
+  }
+}

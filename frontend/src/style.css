@@ -1,0 +1,525 @@
+/*
+ * Navigo 设计系统
+ *
+ * 取向：这是一个会被长时间盯着看的工具，不是展示型产品。
+ * 默认状态下界面接近无彩色，颜色只在「需要你注意」的地方出现。
+ *
+ * 中性色不用纯灰，而是带轻微冷蓝倾向（色相 ~220°，饱和 8~12%）。
+ * 纯灰在大面积深色下会显得发死发脏，微冷的灰更接近纸面观感，
+ * 也和蓝色强调色同源，整体更整。
+ */
+
+:root {
+  color-scheme: light;
+
+  /* --- 背景四层 --- */
+  --c-canvas: #ffffff; /* 最底、数据区 */
+  --c-sunken: #f4f5f7; /* 工具条、页脚 */
+  --c-surface: #fafbfc; /* 侧栏、面板 */
+  --c-raised: #ffffff; /* 弹层、菜单 */
+  --c-chrome-top: #ffffff; /* 顶栏顶端，向 surface 渐变收尾 */
+
+  /* 兼容旧名 */
+  --c-bg: var(--c-canvas);
+  --c-bg-sunken: var(--c-sunken);
+  --c-bg-raised: var(--c-surface);
+  --c-chrome: var(--c-sunken);
+  --c-chrome-active: #e9ebef;
+  --c-sidebar: var(--c-surface);
+
+  /* --- 边框 --- */
+  --c-border: #dfe2e8;
+  --c-border-soft: #ebedf1;
+  --c-border-strong: #c3c8d2;
+
+  /* --- 文字三级 --- */
+  --c-text: #1a1d23;
+  --c-text-secondary: #5c626e;
+  --c-text-tertiary: #9096a1;
+  --c-text-inverse: #ffffff;
+
+  /* --- 功能色：主蓝（操作 / 选中 / 焦点） --- */
+  --c-accent: #2563eb;
+  --c-accent-hover: #1d4ed8;
+  --c-accent-soft: #e8efff;
+  --c-accent-border: #b9d0fb;
+
+  /* --- 青：元数据、类型标签、索引标识 ---
+     刻意与操作蓝区分，避免「哪个蓝色能点」的困惑 */
+  --c-meta: #0e7490;
+  --c-meta-soft: #e0f2f7;
+
+  /* --- 琥珀：只读、警告、触达上限 --- */
+  --c-warning: #b45309;
+  --c-warning-soft: #fdf3e3;
+
+  /* --- 绿：成功、新增行 --- */
+  --c-success: #15803d;
+  --c-success-soft: #e6f6ec;
+
+  /* --- 珊瑚：危险、删除、错误 --- */
+  --c-danger: #dc2626;
+  --c-danger-soft: #fdeaea;
+
+  --c-info-soft: #eef4fd;
+
+  /* --- 数据网格行状态 --- */
+  --c-row-hover: #f6f8fb;
+  --c-row-zebra: #fcfcfd;
+  --c-row-selected: #e8efff;
+  --c-row-inserted: #e9f7ee;
+  --c-row-modified: #fdf6e7;
+  --c-row-deleted: #fdecec;
+  --c-cell-null: #a8aeb9;
+
+  /* --- 引擎标识色 --- */
+  --c-engine-mysql: #0d7490;
+  --c-engine-mariadb: #9a5b2c;
+  --c-engine-postgres: #37559b;
+  --c-engine-sqlite: #566578;
+  --c-engine-redis: #c0392b;
+  --c-engine-gateway: #6b4f9e;
+  --c-engine-mcp: #7c5cbf;
+
+  /* --- 间距标尺：基准 4px --- */
+  --sp-1: 4px;
+  --sp-2: 6px;
+  --sp-3: 8px;
+  --sp-4: 12px;
+  --sp-5: 16px;
+  --sp-6: 24px;
+
+  /* --- 尺寸 --- */
+  --size-toolbar: 50px;
+  --size-tabbar: 32px;
+  --size-statusbar: 24px;
+  --size-bar: 30px; /* 各类工具条统一高度 */
+  --size-row: 24px;
+  --size-header: 30px;
+  --size-tree-row: 24px;
+  --size-control: 24px;
+
+  --radius: 6px;
+  --radius-sm: 4px;
+
+  /* 两段阴影：近距离定位 + 远距离柔化，比单一硬阴影自然 */
+  --shadow-popup: 0 1px 2px rgba(16, 20, 28, 0.08), 0 8px 24px rgba(16, 20, 28, 0.14);
+  --shadow-modal: 0 2px 6px rgba(16, 20, 28, 0.1), 0 24px 56px rgba(16, 20, 28, 0.22);
+
+  /* --- 字体 ---
+     中文显式排在 SF Pro 之后：两者字重感知不同，顺序颠倒会让中文显细。 */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+
+  --font-size: 13px; /* 正文：macOS 原生应用的标准密度 */
+  --font-size-sm: 11px; /* 辅助信息 */
+  --font-size-grid: 12px; /* 数据网格 */
+  --font-size-tag: 10px; /* 类型标签 */
+  --font-size-mono: 12px;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --c-canvas: #17181c;
+  --c-sunken: #1d1f24;
+  --c-surface: #212429;
+  --c-raised: #282c33;
+  --c-chrome-top: #272b32;
+
+  --c-bg: var(--c-canvas);
+  --c-bg-sunken: var(--c-sunken);
+  --c-bg-raised: var(--c-surface);
+  --c-chrome: var(--c-sunken);
+  --c-chrome-active: #2d3138;
+  --c-sidebar: var(--c-surface);
+
+  --c-border: #343941;
+  --c-border-soft: #2a2e35;
+  --c-border-strong: #474d57;
+
+  --c-text: #e6e8ec;
+  --c-text-secondary: #9aa1ad;
+  --c-text-tertiary: #6b7280;
+
+  /* 深色下统一提亮、略降饱和，避免刺眼 */
+  --c-accent: #5b9aff;
+  --c-accent-hover: #7db0ff;
+  --c-accent-soft: #1c2a42;
+  --c-accent-border: #2f4a72;
+
+  --c-meta: #4db6cf;
+  --c-meta-soft: #16303a;
+
+  --c-warning: #e0a94a;
+  --c-warning-soft: #33280f;
+
+  --c-success: #4ec27d;
+  --c-success-soft: #142b1d;
+
+  --c-danger: #ff6b6b;
+  --c-danger-soft: #3a1d1d;
+
+  --c-info-soft: #1a2433;
+
+  --c-row-hover: #22262d;
+  --c-row-zebra: #1a1c21;
+  --c-row-selected: #1e3357;
+  --c-row-inserted: #15301f;
+  --c-row-modified: #33290f;
+  --c-row-deleted: #3a1c1c;
+  --c-cell-null: #6b7280;
+
+  --c-engine-mysql: #4db6cf;
+  --c-engine-mariadb: #c98a5a;
+  --c-engine-postgres: #7b95d8;
+  --c-engine-sqlite: #8b9ab0;
+  --c-engine-redis: #e8695c;
+  --c-engine-gateway: #a98fd8;
+
+  --shadow-popup: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 2px 6px rgba(0, 0, 0, 0.45), 0 24px 56px rgba(0, 0, 0, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--font-size);
+  line-height: 1.45;
+  /* 中文比西文紧凑，补一点字距让混排更匀 */
+  letter-spacing: 0.01em;
+  color: var(--c-text);
+  background: var(--c-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  cursor: default;
+}
+
+/* 所有出现数字的地方统一等宽数字，行号、行数、耗时才能上下对齐 */
+body,
+input,
+button,
+select,
+textarea {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * 文本选择策略。
+ *
+ * 不在 body 上全局禁用再逐个恢复：WebKit 下祖先带了 -webkit-user-select: none 时，
+ * 输入框会彻底无法交互（点不进去），而 Chromium 只是不能选中文字——
+ * 于是在浏览器里调试一切正常，装进 WKWebView 就废了。
+ *
+ * 改成只在「界面骨架」这类明确不需要选中文字的元素上禁用。
+ */
+.no-select,
+button,
+label,
+.btn,
+.badge,
+.tab,
+.tree-row,
+.toolbar,
+.tabbar,
+.statusbar,
+.grid-header,
+.grid-rownum,
+.pager,
+.dsections {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+input,
+textarea {
+  cursor: text;
+}
+
+/* --- 滚动条：细窄，悬停才明显 --- */
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(90, 100, 120, 0.28);
+  border: 3px solid transparent;
+  border-radius: 6px;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(90, 100, 120, 0.5);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+:root[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: rgba(150, 160, 180, 0.25);
+  background-clip: padding-box;
+}
+:root[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 160, 180, 0.45);
+  background-clip: padding-box;
+}
+
+/* --- 按钮 --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  height: var(--size-control);
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-canvas);
+  color: var(--c-text);
+  font-size: var(--font-size);
+  white-space: nowrap;
+  cursor: default;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.btn:hover:not(:disabled) {
+  background: var(--c-sunken);
+  border-color: var(--c-border-strong);
+}
+.btn:active:not(:disabled) {
+  background: var(--c-chrome-active);
+}
+.btn:disabled {
+  opacity: 0.4;
+}
+
+.btn-primary {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--c-accent-hover);
+  border-color: var(--c-accent-hover);
+}
+
+.btn-danger {
+  background: var(--c-danger);
+  border-color: var(--c-danger);
+  color: #fff;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--c-text-secondary);
+  padding: 0 var(--sp-3);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--c-chrome-active);
+  border-color: transparent;
+  color: var(--c-text);
+}
+
+/* --- 输入控件 --- */
+.input,
+.select {
+  height: var(--size-control);
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-canvas);
+  color: var(--c-text);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.input:hover:not(:disabled),
+.select:hover:not(:disabled) {
+  border-color: var(--c-border-strong);
+}
+/* 焦点用外环而不是加粗边框，避免布局跳动 */
+.input:focus,
+.select:focus {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 2px var(--c-accent-soft);
+}
+.input:disabled {
+  background: var(--c-sunken);
+  color: var(--c-text-tertiary);
+}
+.input::placeholder {
+  color: var(--c-text-tertiary);
+}
+
+.select {
+  appearance: none;
+  padding-right: 22px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3 3 3-3' fill='none' stroke='%235c626e' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--sp-2) center;
+}
+:root[data-theme='dark'] .select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3 3 3-3' fill='none' stroke='%239aa1ad' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  cursor: default;
+}
+.checkbox input {
+  margin: 0;
+  accent-color: var(--c-accent);
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.field > label {
+  text-align: right;
+  color: var(--c-text-secondary);
+}
+/* 控件宽度按内容定，不按容器拉满：
+   一个三位数的数字框占满一整行，看起来像是要填一篇文章。 */
+.field > input[type='number'] {
+  width: 104px;
+  justify-self: start;
+}
+.field > select,
+.field > .select {
+  width: auto;
+  min-width: 160px;
+  max-width: 260px;
+  justify-self: start;
+}
+.field > input:not([type='number']),
+.field > .input:not([type='number']) {
+  max-width: 420px;
+}
+.field-hint {
+  grid-column: 2;
+  font-size: var(--font-size-sm);
+  color: var(--c-text-tertiary);
+  margin-top: -6px;
+  margin-bottom: var(--sp-3);
+  line-height: 1.5;
+}
+
+.divider {
+  height: 1px;
+  background: var(--c-border-soft);
+  margin: var(--sp-4) 0;
+}
+
+.muted {
+  color: var(--c-text-secondary);
+}
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
+
+/* --- 标签 --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 17px;
+  padding: 0 var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  background: var(--c-chrome-active);
+  color: var(--c-text-secondary);
+  white-space: nowrap;
+}
+.badge-readonly {
+  background: var(--c-warning-soft);
+  color: var(--c-warning);
+}
+.badge-error {
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+}
+.badge-ok {
+  background: var(--c-success-soft);
+  color: var(--c-success);
+}
+.badge-meta {
+  background: var(--c-meta-soft);
+  color: var(--c-meta);
+}
+
+/* --- 空状态 --- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  gap: var(--sp-3);
+  padding: var(--sp-6);
+  color: var(--c-text-tertiary);
+  text-align: center;
+}
+.empty-state-title {
+  font-size: var(--font-size);
+  font-weight: 600;
+  color: var(--c-text-secondary);
+}
+
+/* 可选中文本的区域（数据、SQL） */
+.selectable,
+code,
+pre {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* --- 加载指示 --- */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--c-border);
+  border-top-color: var(--c-accent);
+  border-radius: 50%;
+  animation: navigo-spin 0.7s linear infinite;
+}
+.spin {
+  animation: navigo-spin 0.9s linear infinite;
+}
+@keyframes navigo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

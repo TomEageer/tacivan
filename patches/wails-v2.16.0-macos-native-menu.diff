@@ -1,0 +1,173 @@
+--- a/internal/frontend/desktop/darwin/WailsContext.h
++++ b/internal/frontend/desktop/darwin/WailsContext.h
+@@ -117,6 +117,7 @@
+ - (void) ExecJS:(NSString*)script;
+ - (NSScreen*) getCurrentScreen;
+ 
++- (void) Preferences;
+ - (void) SetAbout :(NSString*)title :(NSString*)description :(void*)imagedata :(int)datalen;
+ - (void) dealloc;
+ 
+--- a/internal/frontend/desktop/darwin/WailsContext.m
++++ b/internal/frontend/desktop/darwin/WailsContext.m
+@@ -528,7 +528,19 @@
+             return;
+         }
+         if( self.mouseEvent != nil ) {
+-           [self.mainWindow performWindowDragWithEvent:self.mouseEvent];
++            // Tacivan 补丁：拖拽区里的双击按系统偏好处理（缩放/最小化/无），
++            // 和 AppKit 自己的标题栏一致。不拦在这里的话，拖拽会话把第二下点击吃掉，
++            // 网页那边永远收不到 dblclick。
++            if ([self.mouseEvent clickCount] >= 2) {
++                NSString *action = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleActionOnDoubleClick"];
++                if ([action isEqualToString:@"Minimize"]) {
++                    [self.mainWindow miniaturize:nil];
++                } else if (![action isEqualToString:@"None"]) {
++                    [self.mainWindow zoom:nil];
++                }
++                return;
++            }
++            [self.mainWindow performWindowDragWithEvent:self.mouseEvent];
+         }
+         return;
+     }
+@@ -1110,6 +1122,10 @@
+     self.aboutImage = [[NSImage alloc] initWithData:imageData];
+ }
+ 
++- (void) Preferences {
++    processMessage("TP:settings");
++}
++
+ - (void) About {
+ 
+     WailsAlert *alert = [WailsAlert new];
+--- a/internal/frontend/desktop/darwin/WailsMenu.m
++++ b/internal/frontend/desktop/darwin/WailsMenu.m
+@@ -11,6 +11,32 @@
+ #import "WailsMenuItem.h"
+ #import "Role.h"
+ 
++
++// --- Tacivan 补丁：角色菜单的文案跟随语言 ---
++// Wails 把「Edit / Window / About …」写死成英文，导致中文界面下菜单栏一半中文一半英文。
++// 这里按当前首选语言查一张小表；语言来自 NSLocale，会尊重
++// `defaults write <bundle id> AppleLanguages` 这个按应用的覆盖，Go 那边切语言时会写它。
++static NSString* TacivanL(NSString* key) {
++    static NSDictionary* zh = nil;
++    static BOOL isZh = NO;
++    static dispatch_once_t once;
++    dispatch_once(&once, ^{
++        NSString* lang = [[NSLocale preferredLanguages] firstObject] ?: @"en";
++        isZh = [lang hasPrefix:@"zh"];
++        zh = @{
++            @"Edit": @"编辑", @"Undo": @"撤销", @"Redo": @"重做", @"Cut": @"剪切", @"Copy": @"拷贝",
++            @"Paste": @"粘贴", @"Paste and Match Style": @"粘贴并匹配样式", @"Delete": @"删除",
++            @"Select All": @"全选", @"Speech": @"语音", @"Start Speaking": @"开始朗读", @"Stop Speaking": @"停止朗读",
++            @"Window": @"窗口", @"Minimize": @"最小化", @"Zoom": @"缩放", @"Full Screen": @"进入全屏幕",
++            @"Hide Others": @"隐藏其他", @"Show All": @"全部显示",
++            @"About ": @"关于 ", @"Hide ": @"隐藏 ", @"Quit ": @"退出 ", @"Settings…": @"设置…",
++        };
++    });
++    if (!isZh) return key;
++    NSString* v = zh[key];
++    return v ? v : key;
++}
++
+ @implementation WailsMenu
+ 
+ - (NSMenuItem*) newMenuItem :(NSString*)title :(SEL)selector :(NSString*)key :(NSEventModifierFlags)flags {
+@@ -70,16 +96,19 @@
+             WailsMenu *appMenu = [[[WailsMenu new] initWithNSTitle:appName] autorelease];
+             
+             if (ctx.aboutTitle != nil) {
+-                [appMenu addItem:[self newMenuItemWithContext :ctx :[@"About " stringByAppendingString:appName] :@selector(About) :nil :0]];
++                [appMenu addItem:[self newMenuItemWithContext :ctx :[TacivanL(@"About ") stringByAppendingString:appName] :@selector(About) :nil :0]];
++                // Tacivan：设置项按 HIG 放在应用菜单里，⌘, 触发，回调到 Go 再转成 menu:settings 事件
+                 [appMenu addItem:[NSMenuItem separatorItem]];
++                [appMenu addItem:[self newMenuItemWithContext :ctx :TacivanL(@"Settings…") :@selector(Preferences) :@"," :NSEventModifierFlagCommand]];
++                [appMenu addItem:[NSMenuItem separatorItem]];
+             }
+ 
+-            [appMenu addItem:[self newMenuItem:[@"Hide " stringByAppendingString:appName] :@selector(hide:) :@"h" :NSEventModifierFlagCommand]];
+-            [appMenu addItem:[self newMenuItem:@"Hide Others" :@selector(hideOtherApplications:) :@"h" :(NSEventModifierFlagOption | NSEventModifierFlagCommand)]];
+-            [appMenu addItem:[self newMenuItem:@"Show All" :@selector(unhideAllApplications:) :@""]];
++            [appMenu addItem:[self newMenuItem:[TacivanL(@"Hide ") stringByAppendingString:appName] :@selector(hide:) :@"h" :NSEventModifierFlagCommand]];
++            [appMenu addItem:[self newMenuItem:TacivanL(@"Hide Others") :@selector(hideOtherApplications:) :@"h" :(NSEventModifierFlagOption | NSEventModifierFlagCommand)]];
++            [appMenu addItem:[self newMenuItem:TacivanL(@"Show All") :@selector(unhideAllApplications:) :@""]];
+             [appMenu addItem:[NSMenuItem separatorItem]];
+ 
+-            id quitTitle = [@"Quit " stringByAppendingString:appName];
++            id quitTitle = [TacivanL(@"Quit ") stringByAppendingString:appName];
+             NSMenuItem* quitMenuItem = [self newMenuItem:quitTitle :@selector(Quit) :@"q" :NSEventModifierFlagCommand];
+             quitMenuItem.target = ctx;
+             [appMenu addItem:quitMenuItem];
+@@ -88,23 +117,23 @@
+         }
+         case EditMenu:
+         {
+-            WailsMenu *editMenu = [[[WailsMenu new] initWithNSTitle:@"Edit"] autorelease];
+-            [editMenu addItem:[self newMenuItem:@"Undo" :@selector(undo:) :@"z" :NSEventModifierFlagCommand]];
+-            [editMenu addItem:[self newMenuItem:@"Redo" :@selector(redo:) :@"z" :(NSEventModifierFlagShift | NSEventModifierFlagCommand)]];
++            WailsMenu *editMenu = [[[WailsMenu new] initWithNSTitle:TacivanL(@"Edit")] autorelease];
++            [editMenu addItem:[self newMenuItem:TacivanL(@"Undo") :@selector(undo:) :@"z" :NSEventModifierFlagCommand]];
++            [editMenu addItem:[self newMenuItem:TacivanL(@"Redo") :@selector(redo:) :@"z" :(NSEventModifierFlagShift | NSEventModifierFlagCommand)]];
+             [editMenu addItem:[NSMenuItem separatorItem]];
+-            [editMenu addItem:[self newMenuItem:@"Cut" :@selector(cut:) :@"x" :NSEventModifierFlagCommand]];
+-            [editMenu addItem:[self newMenuItem:@"Copy" :@selector(copy:) :@"c" :NSEventModifierFlagCommand]];
+-            [editMenu addItem:[self newMenuItem:@"Paste" :@selector(paste:) :@"v" :NSEventModifierFlagCommand]];
+-            [editMenu addItem:[self newMenuItem:@"Paste and Match Style" :@selector(pasteAsRichText:) :@"v" :(NSEventModifierFlagOption | NSEventModifierFlagShift | NSEventModifierFlagCommand)]];
+-            [editMenu addItem:[self newMenuItem:@"Delete" :@selector(delete:) :[self accel:@"backspace"] :0]];
+-            [editMenu addItem:[self newMenuItem:@"Select All" :@selector(selectAll:) :@"a" :NSEventModifierFlagCommand]];
++            [editMenu addItem:[self newMenuItem:TacivanL(@"Cut") :@selector(cut:) :@"x" :NSEventModifierFlagCommand]];
++            [editMenu addItem:[self newMenuItem:TacivanL(@"Copy") :@selector(copy:) :@"c" :NSEventModifierFlagCommand]];
++            [editMenu addItem:[self newMenuItem:TacivanL(@"Paste") :@selector(paste:) :@"v" :NSEventModifierFlagCommand]];
++            [editMenu addItem:[self newMenuItem:TacivanL(@"Paste and Match Style") :@selector(pasteAsRichText:) :@"v" :(NSEventModifierFlagOption | NSEventModifierFlagShift | NSEventModifierFlagCommand)]];
++            [editMenu addItem:[self newMenuItem:TacivanL(@"Delete") :@selector(delete:) :[self accel:@"backspace"] :0]];
++            [editMenu addItem:[self newMenuItem:TacivanL(@"Select All") :@selector(selectAll:) :@"a" :NSEventModifierFlagCommand]];
+             [editMenu addItem:[NSMenuItem separatorItem]];
+ //            NSMenuItem *speechMenuItem = [[NSMenuItem new] autorelease];
+-//            [speechMenuItem setTitle:@"Speech"];
++//            [speechMenuItem setTitle:TacivanL(@"Speech")];
+ //            [editMenu addItem:speechMenuItem];
+-            WailsMenu *speechMenu =  [[[WailsMenu new] initWithNSTitle:@"Speech"] autorelease];
+-            [speechMenu addItem:[self newMenuItem:@"Start Speaking" :@selector(startSpeaking:) :@""]];
+-            [speechMenu addItem:[self newMenuItem:@"Stop Speaking" :@selector(stopSpeaking:) :@""]];
++            WailsMenu *speechMenu =  [[[WailsMenu new] initWithNSTitle:TacivanL(@"Speech")] autorelease];
++            [speechMenu addItem:[self newMenuItem:TacivanL(@"Start Speaking") :@selector(startSpeaking:) :@""]];
++            [speechMenu addItem:[self newMenuItem:TacivanL(@"Stop Speaking") :@selector(stopSpeaking:) :@""]];
+             [editMenu appendSubmenu:speechMenu];
+             [self appendSubmenu:editMenu];
+             
+@@ -112,11 +141,11 @@
+         }
+         case WindowMenu:
+         {
+-            WailsMenu *windowMenu = [[[WailsMenu new] initWithNSTitle:@"Window"] autorelease];
+-            [windowMenu addItem:[self newMenuItem:@"Minimize" :@selector(performMiniaturize:) :@"m" :NSEventModifierFlagCommand]];
+-            [windowMenu addItem:[self newMenuItem:@"Zoom" :@selector(performZoom:) :@""]];
++            WailsMenu *windowMenu = [[[WailsMenu new] initWithNSTitle:TacivanL(@"Window")] autorelease];
++            [windowMenu addItem:[self newMenuItem:TacivanL(@"Minimize") :@selector(performMiniaturize:) :@"m" :NSEventModifierFlagCommand]];
++            [windowMenu addItem:[self newMenuItem:TacivanL(@"Zoom") :@selector(performZoom:) :@""]];
+             [windowMenu addItem:[NSMenuItem separatorItem]];
+-            [windowMenu addItem:[self newMenuItem:@"Full Screen" :@selector(enterFullScreenMode:) :@"f" :(NSEventModifierFlagControl | NSEventModifierFlagCommand)]];
++            [windowMenu addItem:[self newMenuItem:TacivanL(@"Full Screen") :@selector(enterFullScreenMode:) :@"f" :(NSEventModifierFlagControl | NSEventModifierFlagCommand)]];
+             [self appendSubmenu:windowMenu];
+             
+             break;
+--- a/internal/frontend/desktop/darwin/frontend.go
++++ b/internal/frontend/desktop/darwin/frontend.go
+@@ -410,7 +410,13 @@
+ 		if f.frontendOptions.DragAndDrop != nil && f.frontendOptions.DragAndDrop.EnableFileDrop {
+ 			f.ExecJS("window.wails.flags.enableWailsDragAndDrop = true;")
+ 		}
++
++		return
++	}
+ 
++	// Tacivan 补丁：应用菜单里的「设置…」
++	if message == "TP:settings" {
++		f.Notify("menu:settings")
+ 		return
+ 	}
+ 
