@@ -37,14 +37,14 @@ Go + 系统 WebView，不是 Electron，不用注册账号，没有埋点。
 - 🔐 **密码进钥匙串**，崩溃后编辑器草稿自动恢复，连接可分组、拖拽排序
 - 🆓 **MIT**，单文件，不用登录
 
-|  | Tacivan | DBeaver CE | TablePlus |
-|---|---|---|---|
-| 价格 | **免费（MIT）** | 免费（Apache-2.0） | 免费档 · 收费 |
-| 源码 | **开放** | 开放 | 闭源 |
-| 运行时 | **Go + 系统 WebView** | Java / SWT | 原生 |
-| 引擎 | MySQL · PostgreSQL · SQLite · Redis · **插件** · **MCP** | 很多（JDBC） | 很多 |
-| 自定义连接类型 | **有 — 进程插件，任意语言** | Java 插件 | 无 |
-| 连接 MCP server | **有** | 无 | 无 |
+|  | Tacivan | Navicat Premium | DBeaver CE | TablePlus |
+|---|---|---|---|---|
+| 价格 | **免费（MIT）** | 收费 | 免费（Apache-2.0） | 免费档 · 收费 |
+| 源码 | **开放** | 闭源 | 开放 | 闭源 |
+| 运行时 | **Go + 系统 WebView** | 原生 C++/AppKit | Java / SWT | 原生 |
+| 引擎 | MySQL · PostgreSQL · SQLite · Redis · **插件** · **MCP** | 很多 | 很多（JDBC） | 很多 |
+| 自定义连接类型 | **有 — 进程插件，任意语言** | 无 | Java 插件 | 无 |
+| 连接 MCP server | **有** | 无 | 无 | 无 |
 
 比功能数量不是重点：老牌客户端支持的引擎多得多。Tacivan 的定位是打开快、什么都流式、并且能把公司逼你用的那条奇怪的内部网关接进来。
 
@@ -125,4 +125,4 @@ macOS 13 及以上，Apple Silicon 或 Intel（通用二进制）。
 
 [MIT](LICENSE)。引擎标志仅作识别：MySQL 海豚来自 [devicon](https://github.com/devicons/devicon)（MIT），其余来自 [simple-icons](https://github.com/simple-icons/simple-icons)（CC0 1.0）；商标归各自所有者。
 
-<sub>数据库客户端 · MySQL 图形工具 · PostgreSQL · SQLite · Redis · TablePlus 替代 · DBeaver 替代 · MCP 客户端 · macOS · Go · Wails · Vue</sub>
+<sub>数据库客户端 · MySQL 图形工具 · PostgreSQL · SQLite · Redis · Navicat 替代 · TablePlus 替代 · DBeaver 替代 · MCP 客户端 · macOS · Go · Wails · Vue</sub>

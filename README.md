@@ -37,14 +37,14 @@ Most GUI clients are either a Java app that takes four seconds to open a menu, o
 - 🔐 **Passwords in the Keychain**, drafts auto-recovered after a crash, connection groups with drag-and-drop
 - 🆓 **MIT**, one binary, no sign-in
 
-|  | Tacivan | DBeaver CE | TablePlus |
-|---|---|---|---|
-| Price | **Free (MIT)** | Free (Apache-2.0) | Free tier · paid |
-| Source | **Open** | Open | Closed |
-| Runtime | **Go + native WebView** | Java / SWT | Native |
-| Engines | MySQL · PostgreSQL · SQLite · Redis · **plugins** · **MCP** | Many (JDBC) | Many |
-| Extend with your own connection type | **Yes — process plugin, any language** | Java plugin | No |
-| Talk to MCP servers | **Yes** | No | No |
+|  | Tacivan | Navicat Premium | DBeaver CE | TablePlus |
+|---|---|---|---|---|
+| Price | **Free (MIT)** | Paid | Free (Apache-2.0) | Free tier · paid |
+| Source | **Open** | Closed | Open | Closed |
+| Runtime | **Go + native WebView** | Native C++/AppKit | Java / SWT | Native |
+| Engines | MySQL · PostgreSQL · SQLite · Redis · **plugins** · **MCP** | Many | Many (JDBC) | Many |
+| Extend with your own connection type | **Yes — process plugin, any language** | No | Java plugin | No |
+| Talk to MCP servers | **Yes** | No | No | No |
 
 Feature breadth is not the point: the established clients support far more engines. Tacivan is the one that opens fast, streams everything, and lets you bolt on the weird internal gateway your company makes you use.
 
@@ -125,4 +125,4 @@ See [CHANGELOG.md](CHANGELOG.md).
 
 [MIT](LICENSE). Engine logos are used for identification only: the MySQL dolphin is from [devicon](https://github.com/devicons/devicon) (MIT), the others from [simple-icons](https://github.com/simple-icons/simple-icons) (CC0 1.0); all marks belong to their owners.
 
-<sub>database client · MySQL GUI · PostgreSQL GUI · SQLite · Redis · TablePlus alternative · DBeaver alternative · MCP client · macOS · Go · Wails · Vue</sub>
+<sub>database client · MySQL GUI · PostgreSQL GUI · SQLite · Redis · Navicat alternative · TablePlus alternative · DBeaver alternative · MCP client · macOS · Go · Wails · Vue</sub>
