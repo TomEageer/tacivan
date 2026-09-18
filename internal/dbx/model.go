@@ -103,7 +103,7 @@ type ConnectionConfig struct {
 	ID     string `json:"id"`
 	Name   string `json:"name"`
 	Engine Engine `json:"engine"`
-	// Color 连接颜色标记，对齐 Navicat 的连接色条，用于区分生产/测试环境。
+	// Color 连接颜色标记，对齐主流客户端的连接色条，用于区分生产/测试环境。
 	Color string `json:"color"`
 	// Group 所属分组名，空表示不分组。分组本身只是个名字，见 store.Group。
 	Group string `json:"group,omitempty"`

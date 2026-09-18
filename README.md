@@ -6,7 +6,7 @@
 
 **A fast, open-source database client for macOS — built for people who live in MySQL all day**
 
-Navicat spelled backwards. Streams million-row results without freezing,<br>
+Streams million-row results without freezing,<br>
 opens a 3,000-database MySQL 5.7 instance in seconds, and stays out of your way.<br>
 Go + native WebView, no Electron, no account, no telemetry.
 
@@ -37,16 +37,16 @@ Most GUI clients are either a Java app that takes four seconds to open a menu, o
 - 🔐 **Passwords in the Keychain**, drafts auto-recovered after a crash, connection groups with drag-and-drop
 - 🆓 **MIT**, one binary, no sign-in
 
-|  | Tacivan | Navicat Premium | DBeaver CE | TablePlus |
-|---|---|---|---|---|
-| Price | **Free (MIT)** | Paid | Free (Apache-2.0) | Free tier · paid |
-| Source | **Open** | Closed | Open | Closed |
-| Runtime | **Go + native WebView** | Native C++/AppKit | Java / SWT | Native |
-| Engines | MySQL · PostgreSQL · SQLite · Redis · **plugins** · **MCP** | Many | Many (JDBC) | Many |
-| Extend with your own connection type | **Yes — process plugin, any language** | No | Java plugin | No |
-| Talk to MCP servers | **Yes** | No | No | No |
+|  | Tacivan | DBeaver CE | TablePlus |
+|---|---|---|---|
+| Price | **Free (MIT)** | Free (Apache-2.0) | Free tier · paid |
+| Source | **Open** | Open | Closed |
+| Runtime | **Go + native WebView** | Java / SWT | Native |
+| Engines | MySQL · PostgreSQL · SQLite · Redis · **plugins** · **MCP** | Many (JDBC) | Many |
+| Extend with your own connection type | **Yes — process plugin, any language** | Java plugin | No |
+| Talk to MCP servers | **Yes** | No | No |
 
-Feature breadth is not the point: Navicat and DBeaver support far more engines. Tacivan is the one that opens fast, streams everything, and lets you bolt on the weird internal gateway your company makes you use.
+Feature breadth is not the point: the established clients support far more engines. Tacivan is the one that opens fast, streams everything, and lets you bolt on the weird internal gateway your company makes you use.
 
 ## Quick start
 
@@ -97,7 +97,7 @@ No telemetry, no crash reporting, no update checks, no account. The app talks on
 
 ## FAQ
 
-**Is it a Navicat replacement?**
+**Can it be my only database client?**
 For MySQL / PostgreSQL / SQLite / Redis daily work: browsing, editing data, designing tables, running SQL, exporting, searching — yes. Not (yet): import wizards, scheduled backups, ER diagrams, data dictionary, visual EXPLAIN. Deliberately never: stored-procedure debugger, dashboards, an in-app scheduler.
 
 **Windows / Linux?**
@@ -125,4 +125,4 @@ See [CHANGELOG.md](CHANGELOG.md).
 
 [MIT](LICENSE). Engine logos are used for identification only: the MySQL dolphin is from [devicon](https://github.com/devicons/devicon) (MIT), the others from [simple-icons](https://github.com/simple-icons/simple-icons) (CC0 1.0); all marks belong to their owners.
 
-<sub>database client · MySQL GUI · PostgreSQL GUI · SQLite · Redis · Navicat alternative · TablePlus alternative · DBeaver alternative · MCP client · macOS · Go · Wails · Vue</sub>
+<sub>database client · MySQL GUI · PostgreSQL GUI · SQLite · Redis · TablePlus alternative · DBeaver alternative · MCP client · macOS · Go · Wails · Vue</sub>

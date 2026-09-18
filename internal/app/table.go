@@ -287,7 +287,7 @@ type ChangePreview struct {
 
 // PreviewChanges 生成变更对应的 SQL，但不执行。
 //
-// 对齐 Navicat 的行为：保存之前用户能先看到将要跑的是哪几条语句。
+// 对齐主流客户端的行为：保存之前用户能先看到将要跑的是哪几条语句。
 func (a *App) PreviewChanges(cs ChangeSet) (*ChangePreview, error) {
 	ec, sc, err := a.editTarget(cs.ResultID)
 	if err != nil {

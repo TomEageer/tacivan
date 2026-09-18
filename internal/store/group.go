@@ -10,7 +10,7 @@ import (
 
 // Group 连接分组。分组只是个带顺序的名字：连接通过 ConnectionConfig.Group 指向它。
 //
-// 不做多级嵌套：Navicat 支持，但实际用起来两层就够（生产 / 测试 / 本地），
+// 不做多级嵌套：有的客户端支持，但实际用起来两层就够（生产 / 测试 / 本地），
 // 再深就是在树里找东西比连库还慢。
 type Group struct {
 	Name      string `json:"name"`

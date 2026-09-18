@@ -1,4 +1,4 @@
-// Navigo 是一个开源的图形化数据库客户端，界面与操作逻辑对齐 Navicat，
+// Tacivan 是一个开源的图形化数据库客户端，界面与操作逻辑对齐主流桌面客户端，
 // 支持 MySQL / MariaDB / PostgreSQL / SQLite / Redis。
 //
 // 相对同类工具的主要差别在结果集引擎：行数据以块为单位缓存、受全局内存预算约束、
@@ -94,7 +94,7 @@ func emit(a *app.App, name string) func(*menu.CallbackData) {
 	}
 }
 
-// buildMenu 构造原生菜单栏，结构对齐 Navicat 的菜单组织。
+// buildMenu 构造原生菜单栏，结构对齐主流桌面客户端的菜单组织。
 func buildMenu(a *app.App) *menu.Menu {
 	m := menu.NewMenu()
 	// 菜单是在 wails.Run 之前一次性建好的，之后改不了，

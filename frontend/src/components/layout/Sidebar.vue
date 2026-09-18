@@ -235,7 +235,7 @@ function doRowDblClick(node: TreeNode) {
     return
   }
   if (node.kind === 'object') {
-    // 表/视图双击直接看数据，与 Navicat 一致。
+    // 表/视图双击直接看数据，与主流客户端一致。
     if (node.objectKind === 'table' || node.objectKind === 'view') {
       emit('action', 'open-table', node)
     } else {

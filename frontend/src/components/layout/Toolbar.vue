@@ -96,7 +96,7 @@ const tableLikeSelected = computed(
     node.value?.kind === 'object' &&
     (node.value.objectKind === 'table' || node.value.objectKind === 'view'),
 )
-/** 标题行右侧跟一句当前上下文，和 Navicat 的标题栏同义。 */
+/** 标题行右侧跟一句当前上下文，和主流客户端的标题栏同义。 */
 const context = computed(() => {
   const t = tabs.active
   if (!t) return ''

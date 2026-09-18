@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/** 新建 / 编辑连接。分页结构对齐 Navicat：常规、SSL、SSH、高级。 */
+/** 新建 / 编辑连接。分页结构对齐主流客户端：常规、SSL、SSH、高级。 */
 import { computed, onMounted, ref, watch } from 'vue'
 import * as api from '../../api'
 import { useAppStore } from '../../stores/app'

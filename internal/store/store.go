@@ -44,7 +44,7 @@ type Settings struct {
 	GridPageSize int `json:"gridPageSize"`
 	// RowLimit 打开表数据时给 SELECT 加的 LIMIT，0 表示不加。
 	//
-	// 与 MaxResultRows 的区别：这个是日常浏览的默认上限（对应 Navicat 的
+	// 与 MaxResultRows 的区别：这个是日常浏览的默认上限（对应其它客户端的
 	// 「限制记录数」），MaxResultRows 是防止误操作打穿磁盘的最后一道闸。
 	RowLimit int `json:"rowLimit"`
 	// MemoryLimitMB 结果集全局常驻内存上限。

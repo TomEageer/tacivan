@@ -4,7 +4,7 @@
  *
  * 宽表在网格里横向铺开几十上百列，看一条记录要一直横向滚。
  * 这里把当前行竖过来，字段名与值一一对应，长文本给多行输入框，
- * 和 Navicat 的表单视图是同一个用途。
+ * 和主流客户端的表单视图是同一个用途。
  */
 import { computed, ref, watch } from 'vue'
 import type { Cell, Column, ColumnMeta } from '../../types'

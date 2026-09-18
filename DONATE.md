@@ -3,7 +3,7 @@
 Tacivan is free and open source (MIT), with no ads, no telemetry and no paid tier.
 If it saved you a database-client licence, a small tip keeps it maintained.
 
-Tacivan 免费开源（MIT），没有广告、没有埋点、没有付费版。如果它帮你省下了一份 Navicat 的钱，欢迎请作者喝杯咖啡。
+Tacivan 免费开源（MIT），没有广告、没有埋点、没有付费版。如果它帮你省下了一份数据库客户端的授权费，欢迎请作者喝杯咖啡。
 
 ---
 
