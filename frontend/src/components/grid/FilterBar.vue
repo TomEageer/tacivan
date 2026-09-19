@@ -190,14 +190,6 @@ function onEnter() {
     <Transition name="filter-open">
       <div v-if="expanded" class="filter-body">
       <div v-for="(c, i) in group.conditions" :key="i" class="cond" :class="{ 'is-off': !c.enabled }">
-        <label class="cond-on" :title="c.enabled ? tr('暂时停用该条件') : tr('启用该条件')">
-          <input
-            type="checkbox"
-            :checked="c.enabled"
-            @change="patch(i, { enabled: ($event.target as HTMLInputElement).checked })"
-          />
-        </label>
-
         <span v-if="i > 0" class="cond-conj" @click="update({ conjunction: group.conjunction === 'or' ? 'and' : 'or' })">
           {{ group.conjunction === 'or' ? tr('或') : tr('且') }}
         </span>
@@ -256,7 +248,16 @@ function onEnter() {
         </template>
         <span v-else class="cond-noinput">{{ tr('无需输入') }}</span>
 
-        <button class="cond-del" :title="tr('删除该条件')" @click="removeCondition(i)">
+        <!-- 停用/删除放在行尾：放在 where 左边的勾选框会被读成「关掉整个 WHERE」 -->
+        <button
+          class="cond-tool cond-toggle"
+          :class="{ 'is-off': !c.enabled }"
+          :title="c.enabled ? tr('暂时停用该条件') : tr('启用该条件')"
+          @click="patch(i, { enabled: !c.enabled })"
+        >
+          <Icon :name="c.enabled ? 'check' : 'minus'" :size="11" />
+        </button>
+        <button class="cond-tool cond-del" :title="tr('删除该条件')" @click="removeCondition(i)">
           <Icon name="close" :size="11" />
         </button>
       </div>
@@ -438,21 +439,18 @@ function onEnter() {
   gap: var(--sp-1);
   height: 26px;
 }
-.cond.is-off {
-  opacity: 0.45;
+.cond.is-off .cond-conj,
+.cond.is-off .bare-select,
+.cond.is-off .bare-input,
+.cond.is-off .cond-sep {
+  opacity: 0.4;
 }
 
-.cond-on {
-  display: flex;
-  align-items: center;
-}
-.cond-on input {
-  margin: 0;
-  accent-color: var(--c-accent);
-}
-
+/* 连接词占固定一列，where / 且 / 或 宽度不同也不能把后面的控件顶歪 */
 .cond-conj {
-  min-width: 34px;
+  flex: none;
+  width: 44px;
+  box-sizing: border-box;
   text-align: center;
   font-size: var(--font-size-sm);
   color: var(--c-accent);
@@ -528,7 +526,7 @@ function onEnter() {
   color: var(--c-text-tertiary);
 }
 
-.cond-del {
+.cond-tool {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -541,8 +539,16 @@ function onEnter() {
   color: var(--c-text-tertiary);
   opacity: 0;
 }
-.cond:hover .cond-del {
+.cond:hover .cond-tool,
+.cond-toggle.is-off {
   opacity: 1;
+}
+.cond-toggle:hover {
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+}
+.cond-toggle.is-off {
+  color: var(--c-warning, var(--c-text-secondary));
 }
 .cond-del:hover {
   background: var(--c-danger-soft);
@@ -553,7 +559,7 @@ function onEnter() {
   display: flex;
   gap: var(--sp-1);
   margin-top: var(--sp-1);
-  padding-left: 22px;
+  padding-left: 48px;
 }
 
 .raw-row {
@@ -561,7 +567,6 @@ function onEnter() {
   align-items: center;
   gap: var(--sp-1);
   margin-top: var(--sp-1);
-  padding-left: 22px;
 }
 .raw-row .bare-input {
   max-width: none;

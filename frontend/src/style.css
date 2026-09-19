@@ -392,6 +392,8 @@ textarea {
   align-items: center;
   gap: var(--sp-2);
   cursor: default;
+  white-space: nowrap; /* 窄窗口下「出错即停」不能折成两行 */
+  flex: none;
 }
 .checkbox input {
   margin: 0;

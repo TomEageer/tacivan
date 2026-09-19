@@ -32,6 +32,16 @@ const emit = defineEmits<{
 
 const filter = ref('')
 
+// 点字段名即复制，短暂显示「已复制」代替弹提示。
+const copied = ref('')
+let copiedTimer: ReturnType<typeof setTimeout> | undefined
+function copyName(name: string) {
+  navigator.clipboard?.writeText(name)
+  copied.value = name
+  clearTimeout(copiedTimer)
+  copiedTimer = setTimeout(() => (copied.value = ''), 900)
+}
+
 const columns = computed<ColumnMeta[]>(() => props.data.columns.value)
 
 const row = computed(() => {
@@ -128,7 +138,12 @@ watch(
       <div v-for="x in visibleColumns" :key="x.meta.name" class="rf-field">
         <div class="rf-label">
           <Icon v-if="isKey(x.meta.name)" name="key" :size="11" class="rf-key" />
-          <span class="rf-name" :title="x.meta.name">{{ x.meta.name }}</span>
+          <span
+            class="rf-name"
+            :class="{ 'is-copied': copied === x.meta.name }"
+            :title="tr('点击复制字段名')"
+            @click="copyName(x.meta.name)"
+          >{{ copied === x.meta.name ? tr('已复制') : x.meta.name }}</span>
           <span class="rf-type">{{ defOf(x.meta.name)?.fullType || x.meta.type }}</span>
         </div>
 
@@ -311,6 +326,14 @@ watch(
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: copy;
+  border-radius: var(--radius-sm);
+}
+.rf-name:hover {
+  color: var(--c-accent);
+}
+.rf-name.is-copied {
+  color: var(--c-success, var(--c-accent));
 }
 
 .rf-type {

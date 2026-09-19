@@ -706,6 +706,49 @@ function onContextMenu(rowIndex: number, colIndex: number, e: MouseEvent) {
   menu.value = { x: e.clientX, y: e.clientY, row: rowIndex, col: colIndex }
 }
 
+// 列头右键：复制字段名。写 SQL、写 DTO、发消息给同事，要的都是名字本身。
+const headerMenu = ref<{ x: number; y: number; col: number } | null>(null)
+
+function onHeaderContextMenu(colIndex: number, e: MouseEvent) {
+  hideTipNow()
+  headerMenu.value = { x: e.clientX, y: e.clientY, col: colIndex }
+}
+
+const headerMenuItems = computed<MenuItem[]>(() => {
+  const name = columns.value[headerMenu.value?.col ?? -1]?.name ?? ''
+  return [
+    { key: 'h-copy-name', label: tr('复制字段名 {col}', { col: name }), icon: 'copy' },
+    { key: 'h-copy-name-type', label: tr('复制字段名与类型') },
+    { key: 'sep', separator: true },
+    { key: 'h-copy-all-comma', label: tr('复制全部字段名（逗号分隔）') },
+    { key: 'h-copy-all-lines', label: tr('复制全部字段名（每行一个）') },
+  ]
+})
+
+function onHeaderMenuSelect(key: string) {
+  const idx = headerMenu.value?.col ?? -1
+  headerMenu.value = null
+  const names = columns.value.map((c) => c.name)
+  let text = ''
+  switch (key) {
+    case 'h-copy-name':
+      text = names[idx] ?? ''
+      break
+    case 'h-copy-name-type':
+      text = `${names[idx] ?? ''} ${typeLabel(idx)}`.trim()
+      break
+    case 'h-copy-all-comma':
+      text = names.join(', ')
+      break
+    case 'h-copy-all-lines':
+      text = names.join('\n')
+      break
+    default:
+      return
+  }
+  navigator.clipboard?.writeText(text)
+}
+
 /** 当前操作涉及的行号：有多选就用多选，否则用光标所在行。 */
 function targetRows(): number[] {
   const r = rowRange.value
@@ -731,6 +774,7 @@ const menuItems = computed<MenuItem[]>(() => {
     { key: 'copy-cell', label: tr('复制单元格'), icon: 'copy', shortcut: '⌘C' },
     { key: 'copy-row', label: tr('复制行') + suffix, icon: 'copy' },
     { key: 'copy-with-header', label: tr('复制行（含列名）') + suffix },
+    { key: 'copy-colname', label: colName ? tr('复制字段名 {col}', { col: colName }) : tr('复制字段名'), disabled: !colName },
     { key: 'sep1', separator: true },
     {
       key: 'copy-sql',
@@ -785,6 +829,9 @@ function onMenuSelect(key: string) {
       return
     case 'copy-with-header':
       copyRows(true)
+      return
+    case 'copy-colname':
+      navigator.clipboard?.writeText(colName)
       return
     case 'sql-insert':
     case 'sql-update':
@@ -897,6 +944,7 @@ defineExpose({
           :class="{ 'is-key': isKeyColumn(c.meta.name), 'is-sorted': !!sortDir(c.meta.name) }"
           :style="{ width: c.width + 'px' }"
           @click="onHeaderClick(c.meta.name)"
+          @contextmenu.prevent="onHeaderContextMenu(c.index, $event)"
           @mouseenter="onHeaderEnter($event, c.index)"
           @mouseleave="hideTip()"
         >
@@ -998,6 +1046,14 @@ defineExpose({
       :items="menuItems"
       @select="onMenuSelect"
       @close="menu = null"
+    />
+    <ContextMenu
+      v-if="headerMenu"
+      :x="headerMenu.x"
+      :y="headerMenu.y"
+      :items="headerMenuItems"
+      @select="onHeaderMenuSelect"
+      @close="headerMenu = null"
     />
   </div>
 </template>
