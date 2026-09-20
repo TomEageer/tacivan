@@ -7,12 +7,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"tacivan/internal/envpath"
 )
 
 // 协议：每行一个 JSON-RPC 2.0 消息，双向。
@@ -99,9 +100,14 @@ func Start(ctx context.Context, m *Manifest, config map[string]string, logf func
 
 func (p *Process) spawn() error {
 	argv := p.manifest.Command()
-	cmd := exec.Command(argv[0], argv[1:]...)
+	// 程序坞启动的应用 PATH 里没有 Homebrew/nvm，node 要按登录 shell 的 PATH 找
+	exe, err := envpath.Look(argv[0])
+	if err != nil {
+		return fmt.Errorf("启动插件 %s 失败：找不到 %q（PATH 里没有，试试写绝对路径）: %w", p.manifest.ID, argv[0], err)
+	}
+	cmd := exec.Command(exe, argv[1:]...)
 	cmd.Dir = p.manifest.Dir
-	cmd.Env = append(os.Environ(), "TACIVAN_PLUGIN=1")
+	cmd.Env = envpath.Env("TACIVAN_PLUGIN=1")
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return err

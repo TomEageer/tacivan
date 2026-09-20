@@ -18,12 +18,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"os/exec"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"tacivan/internal/envpath"
 )
 
 // ProtocolVersion 本客户端声明的协议版本。
@@ -258,8 +259,12 @@ func (c *Client) Close() error {
 
 func (c *Client) spawn() error {
 	argv := c.cfg.Command
-	cmd := exec.Command(argv[0], argv[1:]...)
-	cmd.Env = append(os.Environ(), c.cfg.Env...)
+	exe, err := envpath.Look(argv[0])
+	if err != nil {
+		return fmt.Errorf("找不到 %q：程序坞启动的应用 PATH 里没有 Homebrew/nvm 目录，可改写绝对路径: %w", argv[0], err)
+	}
+	cmd := exec.Command(exe, argv[1:]...)
+	cmd.Env = envpath.Env(c.cfg.Env...)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return err
