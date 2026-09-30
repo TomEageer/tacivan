@@ -11,5 +11,7 @@ pkill -f 'Tacivan.app/Contents/MacOS/Tacivan' 2>/dev/null || true
 sleep 1
 rm -rf /Applications/Tacivan.app
 cp -R build/bin/Tacivan.app /Applications/Tacivan.app
+# 装完就把构建产物清掉：否则 Spotlight/程序坞会把 build/bin 里的旧包当成另一个 Tacivan 打开
+trash build/bin 2>/dev/null || /usr/bin/trash build/bin
 open /Applications/Tacivan.app
 echo "已更新 /Applications/Tacivan.app ($(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' /Applications/Tacivan.app/Contents/Info.plist 2>/dev/null))"
