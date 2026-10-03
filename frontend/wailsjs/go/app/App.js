@@ -10,6 +10,10 @@ export function ApplyChanges(arg1) {
   return window['go']['app']['App']['ApplyChanges'](arg1);
 }
 
+export function BeforeClose(arg1) {
+  return window['go']['app']['App']['BeforeClose'](arg1);
+}
+
 export function BuildFilterSQL(arg1, arg2) {
   return window['go']['app']['App']['BuildFilterSQL'](arg1, arg2);
 }
@@ -188,6 +192,10 @@ export function ImportPluginDialog() {
 
 export function InitialAppearance() {
   return window['go']['app']['App']['InitialAppearance']();
+}
+
+export function InitialWindowSize() {
+  return window['go']['app']['App']['InitialWindowSize']();
 }
 
 export function LanguagePreference() {

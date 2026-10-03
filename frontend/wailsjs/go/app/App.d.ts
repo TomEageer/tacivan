@@ -13,6 +13,8 @@ export function AlterTable(arg1:string,arg2:dbx.TableDefinition,arg3:dbx.TableDe
 
 export function ApplyChanges(arg1:app.ChangeSet):Promise<app.ApplyResult>;
 
+export function BeforeClose(arg1:any):Promise<boolean>;
+
 export function BuildFilterSQL(arg1:string,arg2:app.FilterGroup):Promise<string>;
 
 export function CancelExecution(arg1:string):Promise<void>;
@@ -102,6 +104,8 @@ export function ImportPlugin(arg1:string):Promise<app.PluginInfo>;
 export function ImportPluginDialog():Promise<app.PluginInfo>;
 
 export function InitialAppearance():Promise<string>;
+
+export function InitialWindowSize():Promise<number|number>;
 
 export function LanguagePreference():Promise<string>;
 

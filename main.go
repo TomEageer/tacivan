@@ -6,6 +6,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"log"
 
@@ -44,10 +45,11 @@ func main() {
 		appearance = mac.NSAppearanceNameAqua
 	}
 
+	winW, winH := a.InitialWindowSize()
 	err = wails.Run(&options.App{
 		Title:     "Tacivan",
-		Width:     1440,
-		Height:    900,
+		Width:     winW,
+		Height:    winH,
 		MinWidth:  1024,
 		MinHeight: 640,
 		AssetServer: &assetserver.Options{
@@ -55,6 +57,7 @@ func main() {
 		},
 		Menu:             buildMenu(a),
 		OnStartup:        a.Startup,
+		OnBeforeClose:    func(ctx context.Context) bool { return a.BeforeClose(ctx) },
 		OnShutdown:       a.Shutdown,
 		Bind:             []any{a},
 		BackgroundColour: bg,

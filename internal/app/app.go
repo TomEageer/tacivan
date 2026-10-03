@@ -97,10 +97,12 @@ func New() (*App, error) {
 // Startup 由 Wails 在应用启动时调用。
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
+	a.restoreWindow()
 }
 
 // Shutdown 由 Wails 在应用退出时调用，负责关掉所有连接与结果集。
 func (a *App) Shutdown(ctx context.Context) {
+	a.saveWindowFrame()
 	logx.Info("应用退出")
 	logx.Close()
 	a.rs.Shutdown()
