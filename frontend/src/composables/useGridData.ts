@@ -30,6 +30,8 @@ export function useGridData() {
   const limitReached = ref(false)
   /** 用户主动中断了取数：行是真的，只是没读完。 */
   const stopped = ref(false)
+  /** 服务端不会再给出新行（读完、中断、触顶或流出错），超出 loaded 的行不必再请求。 */
+  let ended = false
   const loading = ref(false)
   const error = ref('')
   /** 触发重渲染的版本号：行数据存在非响应式的 Map 里，靠它通知视图。 */
@@ -57,6 +59,7 @@ export function useGridData() {
     complete.value = false
     limitReached.value = false
     stopped.value = false
+    ended = false
     error.value = ''
     if (firstPage) applyPage(firstPage)
     version.value++
@@ -70,6 +73,7 @@ export function useGridData() {
     limitReached.value = page.limitReached
     if (page.stopped) stopped.value = true
     error.value = page.error ?? ''
+    ended = page.complete || page.limitReached || !!page.stopped || !!page.error
 
     // 按块切分写入缓存。首屏的 offset 通常是 0，但分页请求可能落在块中间。
     const rows = page.rows ?? []
@@ -115,6 +119,10 @@ export function useGridData() {
   function ensureChunk(ci: number): Promise<void> {
     if (!resultId.value) return Promise.resolve()
     if (chunks.has(ci) && chunks.get(ci)![0]) return Promise.resolve()
+    // 结果集已到头时，越界的块请求回来必然是空页；而空页照样会 version++，
+    // 依赖 version 的视图（如单行表单停在第 0 行、结果却为空）重算后又会请求，
+    // 形成无限循环——曾一次会话刷出 10G 日志。
+    if (ended && ci * CHUNK >= loaded.value) return Promise.resolve()
     const pending = inflight.get(ci)
     if (pending) return pending
 
@@ -167,6 +175,7 @@ export function useGridData() {
       total.value = n
       loaded.value = n
       complete.value = true
+      ended = true
       version.value++
     } finally {
       loading.value = false

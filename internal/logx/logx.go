@@ -17,7 +17,7 @@ import (
 
 var (
 	mu      sync.Mutex
-	file    *os.File
+	file    *sizedFile
 	logger  atomic.Pointer[slog.Logger]
 	logPath string
 	// enabled 关闭时所有记录函数直接返回，避免格式化开销。
@@ -55,12 +55,7 @@ func Init(dir string, on bool) error {
 	}
 	path := filepath.Join(dir, "tacivan.log")
 
-	// 超过上限就把旧文件挪走，保留一份供事后排查。
-	if st, err := os.Stat(path); err == nil && st.Size() > maxLogBytes {
-		_ = os.Rename(path, path+".1")
-	}
-
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+	f, err := openSized(path, maxLogBytes)
 	if err != nil {
 		return fmt.Errorf("打开日志文件失败: %w", err)
 	}
@@ -81,6 +76,72 @@ func Init(dir string, on bool) error {
 		},
 	})))
 	return nil
+}
+
+// sizedFile 写到上限就轮转的日志文件，超出时把旧文件挪成 .1，保留一份供事后排查。
+//
+// 只在启动时检查大小是不够的：前端一旦反复调用某个接口，一次会话就能
+// 把日志写到几个 G（曾有一次 13 小时写出 10G）。
+type sizedFile struct {
+	mu    sync.Mutex
+	path  string
+	limit int64
+	f     *os.File
+	size  int64
+}
+
+func openSized(path string, limit int64) (*sizedFile, error) {
+	s := &sizedFile{path: path, limit: limit}
+	if st, err := os.Stat(path); err == nil && st.Size() > limit {
+		_ = os.Rename(path, path+".1")
+	}
+	if err := s.open(); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+func (s *sizedFile) open() error {
+	f, err := os.OpenFile(s.path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+	if err != nil {
+		return err
+	}
+	st, err := f.Stat()
+	if err != nil {
+		_ = f.Close()
+		return err
+	}
+	s.f, s.size = f, st.Size()
+	return nil
+}
+
+func (s *sizedFile) Write(p []byte) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.f != nil && s.size > 0 && s.size+int64(len(p)) > s.limit {
+		_ = s.f.Close()
+		s.f = nil
+		_ = os.Rename(s.path, s.path+".1")
+		// 重开失败就丢弃这条日志，不能让写日志的失败影响业务调用。
+		_ = s.open()
+	}
+	if s.f == nil {
+		return len(p), nil
+	}
+	n, err := s.f.Write(p)
+	s.size += int64(n)
+	return n, err
+}
+
+func (s *sizedFile) Close() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.f == nil {
+		return nil
+	}
+	err := s.f.Close()
+	s.f = nil
+	return err
 }
 
 // Path 当前日志文件路径。
