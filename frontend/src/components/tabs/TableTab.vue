@@ -244,6 +244,11 @@ function onViewCell(row: number, column: string) {
   viewer.value = { row, column }
 }
 
+function onViewerApply(value: string) {
+  if (viewer.value) grid.value?.applyEditByName(viewer.value.row, viewer.value.column, value)
+  viewer.value = null
+}
+
 /** 把选中的行复制成可执行语句。 */
 async function onCopySql(kind: string, rowIndexes: number[]) {
   try {
@@ -449,6 +454,8 @@ defineExpose({ refresh: () => load(true), save, exportData: () => (showExport.va
       :result-id="data.resultId.value"
       :row-index="viewer.row"
       :column="viewer.column"
+      :editable="editable && !grid?.isBinaryCell(viewer.row, viewer.column)"
+      @apply="onViewerApply"
       @close="viewer = null"
     />
     <ExportDialog

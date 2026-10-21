@@ -12,19 +12,24 @@ import Modal from '../common/Modal.vue'
 import { formatBytes } from '../grid/cell'
 import { tr } from '../../i18n'
 
-const props = defineProps<{ resultId: string; rowIndex: number; column: string }>()
-const emit = defineEmits<{ (e: 'close'): void }>()
+const props = defineProps<{ resultId: string; rowIndex: number; column: string; editable?: boolean }>()
+const emit = defineEmits<{ (e: 'close'): void; (e: 'apply', value: string): void }>()
 
 const app = useAppStore()
 const loading = ref(true)
 const value = ref('')
 const error = ref('')
 const mode = ref<'text' | 'json' | 'hex'>('text')
+const draft = ref('')
+const canEdit = computed(() => props.editable === true && !loading.value && !error.value)
+const changed = computed(() => draft.value !== value.value)
 
 onMounted(async () => {
   try {
     value.value = await api.GetCellValue(props.resultId, props.rowIndex, props.column)
-    if (looksLikeJson(value.value)) mode.value = 'json'
+    draft.value = value.value
+    // 可编辑时默认进文本视图，JSON 美化视图是只读的。
+    if (!props.editable && looksLikeJson(value.value)) mode.value = 'json'
   } catch (e) {
     error.value = e instanceof Error ? e.message : String(e)
   } finally {
@@ -43,7 +48,7 @@ function looksLikeJson(s: string) {
   }
 }
 
-const byteLength = computed(() => new TextEncoder().encode(value.value).length)
+const byteLength = computed(() => new TextEncoder().encode(canEdit.value ? draft.value : value.value).length)
 
 const displayed = computed(() => {
   if (mode.value === 'json') {
@@ -75,7 +80,7 @@ function toHexDump(s: string): string {
 }
 
 function copy() {
-  navigator.clipboard?.writeText(value.value)
+  navigator.clipboard?.writeText(canEdit.value ? draft.value : value.value)
   app.toast('success', tr('已复制到剪贴板'))
 }
 </script>
@@ -99,12 +104,22 @@ function copy() {
 
       <div v-if="loading" class="viewer-body muted">{{ tr('正在读取完整值…') }}</div>
       <div v-else-if="error" class="viewer-body error">{{ error }}</div>
+      <textarea
+        v-else-if="canEdit && mode === 'text'"
+        v-model="draft"
+        class="viewer-body viewer-edit mono"
+        spellcheck="false"
+      ></textarea>
       <pre v-else class="viewer-body mono selectable">{{ displayed }}</pre>
     </div>
 
     <template #footer>
       <button class="btn" @click="copy">{{ tr('复制') }}</button>
-      <button class="btn btn-primary" @click="emit('close')">{{ tr('关闭') }}</button>
+      <template v-if="canEdit">
+        <button class="btn" @click="emit('close')">{{ tr('取消') }}</button>
+        <button class="btn btn-primary" :disabled="!changed" @click="emit('apply', draft)">{{ tr('应用修改') }}</button>
+      </template>
+      <button v-else class="btn btn-primary" @click="emit('close')">{{ tr('关闭') }}</button>
     </template>
   </Modal>
 </template>
@@ -160,6 +175,14 @@ function copy() {
   line-height: 1.55;
   white-space: pre-wrap;
   word-break: break-word;
+}
+.viewer-edit {
+  resize: none;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  background: var(--c-bg);
+  color: var(--c-text);
 }
 .viewer-body.error {
   color: var(--c-danger);

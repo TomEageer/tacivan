@@ -8,6 +8,7 @@ const enUS: Record<string, string> = {
   // --- 通用动作 ---
   '确定': 'OK',
   '取消': 'Cancel',
+  '应用修改': 'Apply changes',
   '保存': 'Save',
   '关闭': 'Close',
   '删除': 'Delete',

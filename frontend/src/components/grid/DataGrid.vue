@@ -880,6 +880,14 @@ function applyEditByName(rowIndex: number, column: string, value: string | null)
   applyEdit(rowIndex, column, value)
 }
 
+/** 该格是否二进制（不能当文本改）。 */
+function isBinaryCell(rowIndex: number, column: string): boolean {
+  const col = columns.value.findIndex((c) => c.name === column)
+  if (col < 0) return false
+  const serverRows = props.data.scrollRows.value
+  return !!cellOf(rowIndex, col, rowIndex < serverRows ? props.data.rowAt(rowIndex) : undefined)?.x
+}
+
 /** 某一行尚未提交的改动，键为列名。 */
 function pendingEditsFor(rowIndex: number): Record<string, string | null> {
   const out: Record<string, string | null> = {}
@@ -907,6 +915,7 @@ function gotoRow(rowIndex: number) {
 defineExpose({
   collectChanges,
   applyEditByName,
+  isBinaryCell,
   pendingEditsFor,
   gotoRow,
   revertChanges,
